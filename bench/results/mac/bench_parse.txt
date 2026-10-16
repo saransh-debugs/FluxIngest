@@ -1,0 +1,6 @@
+BM_ParseLine_median                 292 ns          289 ns            5 bytes_per_second=366.791Mi/s items_per_second=3.46494M/s
+BM_Hash_median                     2.99 ns         2.95 ns            5 items_per_second=339.337M/s
+BM_InternHit/1000_median           41.4 ns         41.0 ns            5 items_per_second=24.4044M/s
+BM_InternHit/1000000_median         115 ns          113 ns            5 items_per_second=8.83988M/s
+IngestLine/DropNewest_median        501 ns          495 ns            5 items_per_second=2.01884M/s samples/s=6.05652M/s
+IngestLine/DropOldest_median        515 ns          508 ns            5 items_per_second=1.96704M/s samples/s=5.90113M/s
