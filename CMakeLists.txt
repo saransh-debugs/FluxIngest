@@ -52,7 +52,7 @@ elseif(FLUX_SANITIZE STREQUAL "thread")
 endif()
 
 # ---- core: everything except Arrow ----
-set(FLUX_CORE_SOURCES src/line_protocol.cpp)
+set(FLUX_CORE_SOURCES src/line_protocol.cpp src/batch.cpp src/writer.cpp)
 add_library(flux_core STATIC ${FLUX_CORE_SOURCES})
 target_include_directories(flux_core PUBLIC include src)
 target_link_libraries(flux_core PUBLIC FastFloat::fast_float)
@@ -66,9 +66,6 @@ if(FLUX_WITH_ARROW)
   target_compile_options(flux_parquet PRIVATE ${FLUX_WARNINGS})
   target_compile_definitions(flux_parquet PUBLIC FLUX_WITH_ARROW=1)
 
-  add_executable(fluxingest src/main.cpp)
-  target_link_libraries(fluxingest PRIVATE flux_parquet)
-  target_compile_options(fluxingest PRIVATE ${FLUX_WARNINGS})
 endif()
 
 
@@ -85,7 +82,7 @@ if(FLUX_BUILD_TESTS)
 
   set(FLUX_TESTS
     test_spsc_ring test_ring_stress test_interner test_line_protocol
-    test_ingestor)
+    test_ingestor test_consumer_writer)
   foreach(t ${FLUX_TESTS})
     add_executable(${t} tests/${t}.cpp)
     target_link_libraries(${t} PRIVATE flux_core GTest::gtest_main)
