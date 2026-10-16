@@ -49,6 +49,13 @@ if(FLUX_SANITIZE STREQUAL "address")
 elseif(FLUX_SANITIZE STREQUAL "thread")
   add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
   add_link_options(-fsanitize=thread)
+  # GCC warns that TSan doesn't model standalone fences. True: TSan can't
+  # verify the drop-oldest fence pair in spsc_ring.hpp. It still checks every
+  # slot access (they're all atomics), and test_ring_stress checks the fence
+  # logic itself (torn reads, order, exact counts).
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wno-tsan)
+  endif()
 endif()
 
 # ---- core: everything except Arrow ----
