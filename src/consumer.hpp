@@ -97,20 +97,22 @@ class Consumer {
       if (n != 0) {
         append(*cur, n);
         stats_.popped.add(n);
-        idle.reset();
         if (cur->full()) {
           seal(cur, false);
           cur = take(window);
-        } else if (n < want) {
-          // Short batch: wait a moment so the producer gets ahead. Without
-          // this we'd read the cache line it's still writing, and that line
-          // would bounce between cores every few samples (bench_ring.cpp
-          // measured ~2.8x lower throughput).
-          for (int k = 0; k < 32; ++k) cpu_relax();
         }
       } else if (stopping) {
         break;
-      } else {
+      }
+      // A short pop counts as idle. If we kept popping a few samples at a
+      // time right behind the producer, we'd be reading the cache lines it
+      // is still writing, and every sample would bounce a line between
+      // cores (~100 ns each on this CPU). Backing off (up to a 200 us sleep)
+      // lets samples pile up so we drain them in big, cache-friendly runs.
+      // The extra latency is irrelevant: batches sit in memory for seconds.
+      if (n >= kBigPop) {
+        idle.reset();
+      } else if (n < want) {
         idle.idle();
       }
 
@@ -174,6 +176,7 @@ class Consumer {
   DictRemap tags_;
   Clock clock_;
   std::uint64_t seq_ = 0;
+  static constexpr std::size_t kBigPop = 256;
   std::array<Sample, 1024> buf_{};
 };
 

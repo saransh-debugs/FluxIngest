@@ -39,7 +39,8 @@ struct alignas(kCacheLine) ProducerStats {
   OwnedCounter samples_offered;       // pushed into the ring
   OwnedCounter cardinality_rejected;  // interner full, sample dropped
   OwnedCounter recv_errors;           // socket errors other than timeouts
-  OwnedCounter truncated_datagrams;
+  OwnedCounter truncated_datagrams;   // bigger than our buffer: dropped whole
+  OwnedCounter kernel_drops;          // datagrams the kernel dropped (socket buffer full), Linux only
 };
 
 // Written by the consumer thread.

@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Everything, including the Arrow/Parquet half, in the same image used locally.
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t fluxingest-dev docker/
+      - name: Release build + all tests
+        run: scripts/docker_build.sh release
+      - name: ThreadSanitizer
+        run: scripts/docker_build.sh tsan
+      - name: ASan + UBSan
+        run: scripts/docker_build.sh asan
+      - name: End-to-end (real UDP, real Parquet, disk full, kill -9)
+        run: scripts/e2e.sh
+      - name: Fuzz parser (2 min)
+        run: scripts/fuzz.sh 120

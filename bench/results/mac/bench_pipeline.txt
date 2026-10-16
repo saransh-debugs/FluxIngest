@@ -1,0 +1,24 @@
+sink=null overflow=drop-oldest series=1000
+  producer:   1.19M samples/s offered (0.40M lines/s) over 5.0s
+  written:    1.19M samples/s end to end (5.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 23, files: 1, bytes: 0.0 MiB (0.00 bytes/sample)
+  writer busy: 0.02s of 5.0s
+sink=null overflow=drop-oldest series=100000
+  producer:   1.04M samples/s offered (0.35M lines/s) over 5.0s
+  written:    1.04M samples/s end to end (5.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 20, files: 1, bytes: 0.0 MiB (0.00 bytes/sample)
+  writer busy: 0.02s of 5.0s
+sink=null overflow=drop-newest series=1000
+  producer:   1.16M samples/s offered (0.39M lines/s) over 5.0s
+  written:    1.16M samples/s end to end (5.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 23, files: 1, bytes: 0.0 MiB (0.00 bytes/sample)
+  writer busy: 0.02s of 5.0s
+sink=null overflow=drop-newest series=100000
+  producer:   1.08M samples/s offered (0.36M lines/s) over 5.0s
+  written:    1.08M samples/s end to end (5.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 21, files: 1, bytes: 0.0 MiB (0.00 bytes/sample)
+  writer busy: 0.03s of 5.0s

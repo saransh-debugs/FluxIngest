@@ -52,7 +52,7 @@ elseif(FLUX_SANITIZE STREQUAL "thread")
 endif()
 
 # ---- core: everything except Arrow ----
-set(FLUX_CORE_SOURCES src/line_protocol.cpp src/batch.cpp src/writer.cpp)
+set(FLUX_CORE_SOURCES src/line_protocol.cpp src/batch.cpp src/writer.cpp src/udp_receiver.cpp src/pipeline.cpp)
 add_library(flux_core STATIC ${FLUX_CORE_SOURCES})
 target_include_directories(flux_core PUBLIC include src)
 target_link_libraries(flux_core PUBLIC FastFloat::fast_float)
@@ -66,8 +66,16 @@ if(FLUX_WITH_ARROW)
   target_compile_options(flux_parquet PRIVATE ${FLUX_WARNINGS})
   target_compile_definitions(flux_parquet PUBLIC FLUX_WITH_ARROW=1)
 
+  add_executable(fluxingest src/main.cpp)
+  target_link_libraries(fluxingest PRIVATE flux_parquet)
+  target_compile_options(fluxingest PRIVATE ${FLUX_WARNINGS})
+
 endif()
 
+
+add_executable(flux_loadgen tools/loadgen.cpp)
+target_link_libraries(flux_loadgen PRIVATE flux_core)
+target_compile_options(flux_loadgen PRIVATE ${FLUX_WARNINGS})
 
 # ---- tests ----
 if(FLUX_BUILD_TESTS)
@@ -82,7 +90,7 @@ if(FLUX_BUILD_TESTS)
 
   set(FLUX_TESTS
     test_spsc_ring test_ring_stress test_interner test_line_protocol
-    test_ingestor test_consumer_writer)
+    test_ingestor test_consumer_writer test_pipeline)
   foreach(t ${FLUX_TESTS})
     add_executable(${t} tests/${t}.cpp)
     target_link_libraries(${t} PRIVATE flux_core GTest::gtest_main)
@@ -116,12 +124,21 @@ if(FLUX_BUILD_BENCH AND FLUX_SANITIZE STREQUAL "")
     add_executable(${b} bench/${b}.cpp)
     target_link_libraries(${b} PRIVATE flux_core benchmark::benchmark)
   endforeach()
+  add_executable(bench_pipeline bench/bench_pipeline.cpp)
+  if(FLUX_WITH_ARROW)
+    target_link_libraries(bench_pipeline PRIVATE flux_parquet)
+  else()
+    target_link_libraries(bench_pipeline PRIVATE flux_core)
+  endif()
 endif()
 
 # ---- fuzz ----
+# The parser source is compiled into the target (not linked from flux_core)
+# so libFuzzer's coverage instrumentation sees inside it.
 if(FLUX_BUILD_FUZZ)
-  add_executable(fuzz_line_protocol fuzz/fuzz_line_protocol.cpp)
-  target_compile_options(fuzz_line_protocol PRIVATE -fsanitize=fuzzer,address,undefined)
+  add_executable(fuzz_line_protocol fuzz/fuzz_line_protocol.cpp src/line_protocol.cpp)
+  target_include_directories(fuzz_line_protocol PRIVATE include)
+  target_link_libraries(fuzz_line_protocol PRIVATE FastFloat::fast_float)
+  target_compile_options(fuzz_line_protocol PRIVATE -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=all)
   target_link_options(fuzz_line_protocol PRIVATE -fsanitize=fuzzer,address,undefined)
-  target_link_libraries(fuzz_line_protocol PRIVATE flux_core)
 endif()

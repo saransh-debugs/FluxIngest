@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 PRESET="${1:-release}"
 docker image inspect fluxingest-dev >/dev/null 2>&1 || docker build -t fluxingest-dev docker/
 # --tmpfs /small: a 1 MiB filesystem for the real disk-full test.
-docker run --rm -t \
+docker run --rm \
   -v "$PWD":/src -w /src \
   --tmpfs /small:size=1m -e FLUX_SMALL_DIR=/small \
   fluxingest-dev bash -c "

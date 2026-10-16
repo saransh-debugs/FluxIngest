@@ -14,4 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && pip3 install --break-system-packages --no-cache-dir duckdb \
     && rm -rf /var/lib/apt/lists/*
 
+
+# clang's sanitizer + libFuzzer runtimes (scripts/fuzz.sh).
+RUN apt-get update && apt-get install -y --no-install-recommends libclang-rt-18-dev \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
