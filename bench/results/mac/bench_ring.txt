@@ -1,14 +1,14 @@
-Transfer/SpscDropNewest/1/real_time_median          296 ms          292 ms            5 items_per_second=33.8097M/s
-Transfer/SpscDropNewest/256/real_time_median       36.1 ms         35.4 ms            5 items_per_second=277.078M/s
-Transfer/SpscDropOldest/1/real_time_median          872 ms          842 ms            5 items_per_second=11.4733M/s
-Transfer/SpscDropOldest/256/real_time_median       35.4 ms         35.0 ms            5 items_per_second=282.885M/s
-Transfer/MutexRing/1/real_time_median              1256 ms          981 ms            5 items_per_second=7.96451M/s
-Transfer/MutexRing/256/real_time_median             928 ms          743 ms            5 items_per_second=10.7792M/s
-Transfer/MutexDeque/1/real_time_median             1420 ms          640 ms            5 items_per_second=7.04124M/s
-Transfer/MutexDeque/256/real_time_median           1149 ms          769 ms            5 items_per_second=8.70559M/s
-PushFull/DropNewest_median                         1.04 ns         1.01 ns            5 items_per_second=985.435M/s
-PushFull/DropOldest_median                         14.3 ns         14.0 ns            5 items_per_second=71.2127M/s
-PushNotFull/DropNewest_median                      2.26 ns         2.21 ns            5 items_per_second=452.434M/s
-PushNotFull/DropOldest_median                      3.93 ns         3.89 ns            5 items_per_second=257.343M/s
-Overloaded/DropNewest/real_time_median             29.1 ms         28.8 ms            5 drop_pct=93.9072 items_per_second=343.298M/s
-Overloaded/DropOldest/real_time_median              132 ms          128 ms            5 drop_pct=81.2939 items_per_second=75.9142M/s
+Overloaded/DropNewest/real_time_median       28.5 ms         28.4 ms            3 drop_pct=93.9322 items_per_second=350.655M/s
+Overloaded/DropOldest/real_time_median        127 ms          126 ms            3 drop_pct=81.5607 items_per_second=78.9701M/s
+PushFull/DropNewest_median      0.891 ns        0.889 ns            3 items_per_second=1.12534G/s
+PushFull/DropOldest_median       12.9 ns         12.9 ns            3 items_per_second=77.8059M/s
+PushNotFull/DropNewest_median       1.60 ns         1.60 ns            3 items_per_second=626.344M/s
+PushNotFull/DropOldest_median       3.84 ns         3.83 ns            3 items_per_second=261.382M/s
+Transfer/MutexRing/1/real_time_median          1275 ms         1014 ms            3 items_per_second=7.84376M/s
+Transfer/MutexRing/256/real_time_median         873 ms          725 ms            3 items_per_second=11.4573M/s
+Transfer/MutexDeque/1/real_time_median         1322 ms         1050 ms            3 items_per_second=7.56435M/s
+Transfer/MutexDeque/256/real_time_median        994 ms          807 ms            3 items_per_second=10.0561M/s
+Transfer/SpscDropNewest/1/real_time_median          292 ms          291 ms            3 items_per_second=34.2419M/s
+Transfer/SpscDropNewest/256/real_time_median       35.2 ms         35.1 ms            3 items_per_second=284.002M/s
+Transfer/SpscDropOldest/1/real_time_median         1019 ms         1015 ms            3 items_per_second=9.81771M/s
+Transfer/SpscDropOldest/256/real_time_median       34.9 ms         34.8 ms            3 items_per_second=286.283M/s

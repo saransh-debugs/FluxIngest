@@ -1,0 +1,16 @@
+sink=null overflow=drop-oldest series=10000
+  producer:   4.16M samples/s offered (1.39M lines/s) over 4.0s
+  written:    4.15M samples/s end to end (4.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 64, files: 1, bytes: 0.0 MiB (0.00 bytes/sample)
+  writer busy: 0.02s of 4.0s
+sink=parquet overflow=drop-oldest series=10000
+  producer:   4.22M samples/s offered (1.41M lines/s) over 4.0s
+  written:    4.18M samples/s end to end (4.0s incl. drain + final commit)
+  dropped:    ring 0.00%  batch 0.00%  write_err 0.00%
+  row groups: 65, files: 1, bytes: 31.6 MiB (1.96 bytes/sample)
+  writer busy: 2.70s of 4.0s
+udp shards=1: loadgen sent 1.56M samples/s; server took 1.55M samples/s (99.2%), kernel dropped 1606 of 195107 packets, ring dropped 0, written 7740040
+udp shards=2: loadgen sent 1.01M samples/s; server took 1.01M samples/s (100.0%), kernel dropped 0 of 126768 packets, ring dropped 0, written 5070720
+
+docker VM: 4 CPUs, 5152808960 bytes, host: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz

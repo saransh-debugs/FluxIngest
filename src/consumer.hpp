@@ -104,12 +104,14 @@ class Consumer {
       } else if (stopping) {
         break;
       }
-      // A short pop counts as idle. If we kept popping a few samples at a
-      // time right behind the producer, we'd be reading the cache lines it
-      // is still writing, and every sample would bounce a line between
-      // cores (~100 ns each on this CPU). Backing off (up to a 200 us sleep)
-      // lets samples pile up so we drain them in big, cache-friendly runs.
-      // The extra latency is irrelevant: batches sit in memory for seconds.
+      // A short pop counts as idle: back off (spin, yield, then a 200 us
+      // sleep) and let samples pile up, so we drain them in big runs instead
+      // of trailing the producer a few samples at a time. In bench_ring's
+      // tight two-thread loop, trailing that closely made cache lines bounce
+      // between cores (~2.8x slower). In the full pipeline the producer is
+      // slower (it parses), and measured throughput was the same either way
+      // (~5M samples/s), so this mostly keeps the consumer from spinning.
+      // The extra latency doesn't matter: batches sit in memory for seconds.
       if (n >= kBigPop) {
         idle.reset();
       } else if (n < want) {

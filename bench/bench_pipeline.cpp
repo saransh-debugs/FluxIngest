@@ -4,7 +4,7 @@
 // where samples get dropped when something can't keep up.
 //
 //   bench_pipeline [--seconds=5] [--series=10000] [--sink=null|parquet] [--out=DIR]
-//                  [--overflow=drop-oldest|drop-newest]
+//                  [--overflow=drop-oldest|drop-newest] [--rate=SAMPLES_PER_S]
 
 #include <atomic>
 #include <chrono>
@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include "flux/clock.hpp"
@@ -67,6 +68,7 @@ int main(int argc, char** argv) {
   const std::string sink_kind = arg(argc, argv, "--sink", "null");
   const std::string out = arg(argc, argv, "--out", "/tmp/flux-bench");
   const std::string overflow = arg(argc, argv, "--overflow", "drop-oldest");
+  const double rate = std::stod(arg(argc, argv, "--rate", "0"));  // samples/s, 0 = flat out
 
   // 2000 packets x 20 lines x 3 fields, cycling through `series` tag sets.
   std::vector<std::string> packets;
@@ -115,7 +117,12 @@ int main(int argc, char** argv) {
       if (++i == packets.size()) i = 0;
     }
     sent += 64 * samples_per_packet;
-    if (mono_ns() >= end) break;
+    const std::int64_t now = mono_ns();
+    if (now >= end) break;
+    if (rate > 0) {
+      const auto due = t0 + static_cast<std::int64_t>(static_cast<double>(sent) / rate * 1e9);
+      if (due > now) std::this_thread::sleep_for(std::chrono::nanoseconds(due - now));
+    }
   }
   const double produce_s = static_cast<double>(mono_ns() - t0) / 1e9;
   const bool clean = shard->stop(std::chrono::seconds(60));
