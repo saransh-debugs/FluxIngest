@@ -115,6 +115,28 @@ GROUP BY ALL ORDER BY 4 DESC LIMIT 10;
 
 One file per shard per time window. One row group per batch. Everything is zstd-compressed.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    SND[UDP senders] -- "line protocol" --> K["kernel<br/>SO_REUSEPORT spreads packets over shards"]
+    subgraph Shard["One shard (x N, shares nothing)"]
+        R["receiver thread<br/>recvmmsg, parse, intern"]
+        C["consumer thread<br/>fill column batches"]
+        W["writer thread<br/>only thread that touches disk"]
+        R -- "SPSC ring<br/>lock-free, lossy" --> C
+        C -- "batch queue<br/>fixed pool, drop oldest" --> W
+    end
+    K --> R
+    W -- ".tmp, fsync, rename" --> P[("Parquet + zstd")]
+    P --> Q[DuckDB or any Parquet reader]
+```
+
+- **Each thread owns one thing.** Receiver owns the socket and interner. Consumer owns the open batch. Writer owns the disk.
+- **Every hand-off is bounded.** A full ring or full batch queue drops data and counts it. Nothing waits.
+- **Shards share nothing.** Each has its own socket, ring, batches and files. More cores = more shards.
+- **All memory is allocated at startup.** The log prints the budget per shard.
+
 ## How it works
 
 ### Producer: parse and intern (receiver thread)
